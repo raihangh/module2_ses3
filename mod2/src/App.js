@@ -1,10 +1,11 @@
 import './App.css';
-import Musicbox from './pages/musicbox/musicbox';
+import Home from './pages/home';
 
 function App() {
   return (
     <div className="App">
-      <Musicbox />
+      {/* <Musicbox /> */}
+      <Home />
     </div>
   );
 }
