@@ -6,14 +6,24 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
     padding: 20px;
     margin: 15px 10px 0 10px;
+}
+.musicbox-wrap:hover{
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    position: relative;
+    /* scale: ; */
 }
 .music-content{
     width: 100%;
     text-align: left;
     height: auto;
+}
+.music-action{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 .img-song{
     width: 100%;
@@ -25,6 +35,7 @@
     font-weight: 600;
 }
  
-.btn-blue{
+.btn-spotify{
     width: 100%;
+    margin-bottom: 10px;
 }
