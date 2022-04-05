@@ -2,28 +2,49 @@ import React, { useEffect, useState } from 'react'
 import Musicbox from '../components/musicbox/musicbox';
 import SearchBar from '../components/searchbar/index';
 import config from '../lib/config';
+import CreatePlaylistForm from '../components/playlistform/index';
+import { getUserProfile } from '../lib/fetchApi';
+import { toast } from 'react-toastify';
+import { useDocumentTitle } from '../lib/custom';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../slice/auth';
 
 export default function Home() {
-  const [accessToken, setAccessToken] = useState('');
-  const [isAuthorize, setIsAuthorize] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [selectedTracksUri, setSelectedTracksUri] = useState([]);
+  const [selectedTracks, setSelectedTracks] = useState([]);
   const [isInSearch, setIsInSearch] = useState(false);
+  const isAuthorize = useSelector((state) => state.auth.isAuthorize);
+  const dispatch = useDispatch();
+
+  useDocumentTitle('Home - Spotipy');
 
   useEffect(() => {
-    const accessToken = new URLSearchParams(window.location.hash).get('#access_token');
+    const accessTokenParams = new URLSearchParams(window.location.hash).get('#access_token');
 
-    setAccessToken(accessToken);
-    setIsAuthorize(accessToken !== null);
+    if (accessTokenParams !== null) {
+      const setUserProfile = async () => {
+        try {
+          const responseUser = await getUserProfile(accessTokenParams);
+
+          dispatch(login({
+            accessToken: accessTokenParams,
+            user: responseUser
+          }));
+        } catch (e) {
+          toast.error(e);
+        }
+      }
+
+      setUserProfile();
+    }
   }, []);
 
   useEffect(() => {
     if (!isInSearch) {
-      const selectedTracks = filterSelectedTracks();
-
       setTracks(selectedTracks);
     }
-  }, [selectedTracksUri]);
+  }, [selectedTracksUri, selectedTracks, isInSearch]);
 
   const getSpotifyLinkAuthorize = () => {
     const state = Date.now().toString();
@@ -32,34 +53,28 @@ export default function Home() {
     return `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=http://localhost:3000&state=${state}&scope=${config.SPOTIFY_SCOPE}`;
   }
 
-  const filterSelectedTracks = () => {
-    return tracks.filter((track) => selectedTracksUri.includes(track.uri));
-  }
-
   const onSuccessSearch = (searchTracks) => {
     setIsInSearch(true);
-    const selectedTracks = filterSelectedTracks();
-    const searchDistincTracks = searchTracks.filter((track) => !selectedTracksUri.includes(track.uri));
 
-    setTracks([...selectedTracks, ...searchDistincTracks]);
+    const selectedSearchTracks = searchTracks.filter((track) => selectedTracksUri.includes(track.uri));
+
+    setTracks([...new Set([...selectedSearchTracks, ...searchTracks])])
   }
 
-
   const clearSearch = () => {
-    const selectedTracks = filterSelectedTracks();
-    
     setTracks(selectedTracks);
     setIsInSearch(false);
   }
-
 
   const toggleSelect = (track) => {
     const uri = track.uri;
 
     if (selectedTracksUri.includes(uri)) {
       setSelectedTracksUri(selectedTracksUri.filter((item) => item !== uri));
+      setSelectedTracks(selectedTracks.filter((item) => item.uri !== uri));
     } else {
       setSelectedTracksUri([...selectedTracksUri, uri]);
+      setSelectedTracks([...selectedTracks, track]);
     }
   }
 
@@ -72,11 +87,12 @@ export default function Home() {
         </main>
       )}
 
+      
       {isAuthorize && (
         <main className="container" id="home">
+          <CreatePlaylistForm uriTracks={selectedTracksUri} />
           <SearchBar
-            accessToken={accessToken}
-            onSuccess={(tracks) => onSuccessSearch(tracks)}
+            onSuccess={onSuccessSearch}
             onClearSearch={clearSearch}
           />
 
@@ -98,6 +114,7 @@ export default function Home() {
                   artist={track.artists[0].name}
                   urlspotify={track.external_urls.spotify}
                   toggleSelect={() => toggleSelect(track)}
+                  select={selectedTracksUri.includes(track.uri)}
                 />
               ))}
           </div>
