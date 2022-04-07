@@ -1,0 +1,19 @@
+.card__content {
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+}
+.home__nocards {
+	margin-top: 16px;
+	width: 100%;
+	color: var(--white);
+	text-align: center;
+	font-size: 20px;
+}
+
+.home__cards {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	column-gap: 20px;
+	row-gap: 40px;
+}

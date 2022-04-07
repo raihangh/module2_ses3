@@ -17,7 +17,7 @@ export default function Home() {
   const isAuthorize = useSelector((state) => state.auth.isAuthorize);
   const dispatch = useDispatch();
 
-  useDocumentTitle('Home - Spotipy');
+  useDocumentTitle('Gigih');
 
   useEffect(() => {
     const accessTokenParams = new URLSearchParams(window.location.hash).get('#access_token');

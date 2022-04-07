@@ -6,71 +6,68 @@ import './index.css';
 
 export default function CreatePlaylistForm({ uriTracks }) {
   const accessToken = useSelector((state) => state.auth.accessToken);
-  const userId = useSelector((state) => state.auth.user.id);
+	const userId = useSelector((state) => state.auth.user.id);
 
-  const [form, setForm] = useState({
-    title: '',
-    description: '',
-  });
+	const [form, setForm] = useState({
+		title: "",
+		description: "",
+	});
 
-  const [errorForm, setErrorForm] = useState({
-    title: '',
-    description: '',
-  });
+	const [errorForm, setErrorForm] = useState({
+		title: "",
+		description: "",
+	});
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+	const handleChange = (e) => {
+		const { name, value } = e.target;
 
-    setForm({ ...form, [name]: value });
-    setErrorForm({ ...errorForm, [name]: '' });
-  }
+		setForm({ ...form, [name]: value });
+		setErrorForm({ ...errorForm, [name]: "" });
+	};
 
-  const validateForm = () => {
-    let isValid = true;
+	const validateForm = () => {
+		let isValid = true;
 
-    if (form.title.length < 10) {
-      setErrorForm({
-        ...errorForm,
-        title: 'Title must be at least 10 characters long'
-      });
-      isValid = false;
-    }
+		if (form.title.length < 5) {
+			setErrorForm({
+				...errorForm,
+				title: "Title must be at least 10 characters long",
+			});
+			isValid = false;
+		}
 
-    if (form.description.length > 100) {
-      setErrorForm({
-        ...errorForm,
-        description: 'Description must be less than 100 characters long'
-      });
-      isValid = false;
-    }
+		return isValid;
+	};
 
-    return isValid;
-  }
+	const handleSubmit = async (e) => {
+		e.preventDefault();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+		if (validateForm()) {
+			try {
+				const responseCreatePlaylist = await createPlaylist(
+					accessToken,
+					userId,
+					{
+						name: form.title,
+						description: form.description,
+					}
+				);
 
-    if (validateForm()) {
-      if (uriTracks.length > 0) {
-        try {
-          const responseCreatePlaylist = await createPlaylist(accessToken, userId, {
-            name: form.title,
-            description: form.description,
-          });
+				await addTracksToPlaylist(
+					accessToken,
+					responseCreatePlaylist.id,
+					uriTracks
+				);
 
-          await addTracksToPlaylist(accessToken, responseCreatePlaylist.id, uriTracks);
+				toast.success("Playlist created successfully");
 
-          toast.success('Playlist created successfully');
+				setForm({ title: "", description: "" });
+			} catch (error) {
+				toast.error(error);
+			}
+		}
+	};
 
-          setForm({ title: '', description: '' });
-        } catch (error) {
-          toast.error(error);
-        }
-      } else {
-        toast.error('Please select at least one track');
-      }
-    }
-  }
 
   return (
     <div className="create-playlist-form">
