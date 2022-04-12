@@ -65,10 +65,9 @@ const CreatePlaylist = () => {
                     onClearSearch={clearSearch}
                 />
 
-				<div className="home__nocards">
+				<div className="home__cards">
 					{tracks.length === 0 && <p>No tracks</p>}
 
-					<div className="home__cards">
 						{tracks.map((data) => (
 							<Musicbox
 								key={data.id}
@@ -81,7 +80,6 @@ const CreatePlaylist = () => {
 							/>
 						))}
 					</div>
-				</div>
 			</main>
 		</div>
 	);

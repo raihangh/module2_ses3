@@ -71,11 +71,11 @@ export default function CreatePlaylistForm({ uriTracks }) {
 
   return (
     <div className="create-playlist-form">
-      <div>
         <h2>Create Playlist</h2>
 
         <form className="form form-playlist" onSubmit={handleSubmit}>         
             <input
+			  className="form-search__input input-title-playlist"
               label="Title"
               placeholder="Title of playlist"
               value={form.title}
@@ -86,7 +86,8 @@ export default function CreatePlaylistForm({ uriTracks }) {
               required
             />
                     
-            <input
+            <textarea
+			  className="form-search__input"
               type='textarea'
               label="Description"
               placeholder="Description of playlist"
@@ -99,10 +100,9 @@ export default function CreatePlaylistForm({ uriTracks }) {
             />
           
           <div className="form-playlist__action">
-            <button className='btn' type="submit">Create</button>
+            <button className='btn btn-create-playlist' type="submit">Create</button>
           </div>
         </form>
-      </div>
     </div>
   )
 }
