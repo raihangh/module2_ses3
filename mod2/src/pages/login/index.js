@@ -5,6 +5,7 @@ import config from "../../lib/config";
 import { getUserProfile } from "../../lib/fetchApi";
 import { login } from "../../slice/auth";
 import "./index.css";
+import Navbar from "../../components/navbar";
 
 const LoginPage = () => {
 	const dispatch = useDispatch();
@@ -42,6 +43,7 @@ const LoginPage = () => {
 
 	return (
 		<div className="home">
+			<Navbar />
 			<div className="auth__content">
 				<button className="auth__button">
 					<a href={getSpotifyLinkAuth()}>

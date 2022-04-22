@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './musicbox.css'
+import './index.css'
 
 export default function Track({ urlimg, title, artist, urlspotify, toggleSelect, select }) {
   const [isSelected, setIsSelected] = useState(select);
@@ -16,11 +16,11 @@ export default function Track({ urlimg, title, artist, urlspotify, toggleSelect,
              <p className='title-song'>{title}</p>
              <p className='artis-song'>{artist}</p>
          </div> 
-         
+
          <div className="music-action">
           <a className='btn btn-spotify' href={urlspotify}>Play</a>
           <button className='btn' onClick={handleToggleSelect}>{isSelected ? 'Deselect' : 'Select'}</button>
         </div>
      </div>
   );
-}
+} 

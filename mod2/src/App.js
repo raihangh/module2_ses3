@@ -1,28 +1,27 @@
-import { BrowserRouter as Router, Switch, Route, Redirect, } from "react-router-dom";
-import { useSelector } from "react-redux";
-import CreatePlaylist from "./pages/playlist/index";
-import LoginPage from "./pages/login/index";
-import "./App.css";
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+import './App.css';
+import Login from './pages/login';
+import CreatePlaylist from './pages/playlist'
+import {useSelector} from 'react-redux';
 
-export default function App() {
-	const token = useSelector((state) => state.auth.accessToken);
-
+const App = () => {
+	const isLogin = useSelector(state => state.auth.isLogin);
 	return (
-		<div className="container">
-			<Router>
-				<Switch>
-					<Route path="/create-playlist">
-						{token !== "" ? <CreatePlaylist /> : <Redirect to="/" />}
-					</Route>
-					<Route exact path="/">
-						{token !== "" ? (
-							<Redirect to="/create-playlist" />
-						) : (
-							<LoginPage />
-						)}
-					</Route>
-				</Switch>
-			</Router>
-		</div>
+	  <Router>
+		<Switch>
+		  <Route path={"/create-playlist"}>
+			{isLogin ? (
+			  <CreatePlaylist />
+			):(
+			  <Redirect to={"/"}/>
+		  )}
+		  </Route>
+		  <Route path={"/"} >
+			<Login/>
+		  </Route>
+		</Switch>
+	  </Router>
 	);
-}
+  }
+  
+  export default App;

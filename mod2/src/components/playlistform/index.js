@@ -1,72 +1,66 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { addTracksToPlaylist, createPlaylist } from '../../lib/fetchApi';
+import config from '../../lib/config';
 import './index.css';
 
 export default function CreatePlaylistForm({ uriTracks }) {
-  const accessToken = useSelector((state) => state.auth.accessToken);
-	const userId = useSelector((state) => state.auth.user.id);
+	const accessToken = useSelector((state) => state.auth.accessToken);
+    const userId = useSelector((state) => state.auth.user.id);
+    
+    const [form, setForm] = useState({
+        title: '',
+        description: ''
+    }) 
 
-	const [form, setForm] = useState({
-		title: "",
-		description: "",
-	});
+    const handleChange = (e) =>{
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
+    }
 
-	const [errorForm, setErrorForm] = useState({
-		title: "",
-		description: "",
-	});
-
-	const handleChange = (e) => {
-		const { name, value } = e.target;
-
-		setForm({ ...form, [name]: value });
-		setErrorForm({ ...errorForm, [name]: "" });
-	};
-
-	const validateForm = () => {
-		let isValid = true;
-
-		if (form.title.length < 5) {
-			setErrorForm({
-				...errorForm,
-				title: "Title must be at least 10 characters long",
-			});
-			isValid = false;
-		}
-
-		return isValid;
-	};
-
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-
-		if (validateForm()) {
-			try {
-				const responseCreatePlaylist = await createPlaylist(
-					accessToken,
-					userId,
-					{
-						name: form.title,
-						description: form.description,
-					}
-				);
-
-				await addTracksToPlaylist(
-					accessToken,
-					responseCreatePlaylist.id,
-					uriTracks
-				);
-
-				toast.success("Playlist created successfully");
-
-				setForm({ title: "", description: "" });
-			} catch (error) {
-				toast.error(error);
-			}
-		}
-	};
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if(form.title.length > 10){
+            try {
+                const requestOptions = {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken,
+                        'Content-Type': 'application/json',
+                    }
+                }
+                
+                const optionsCreatePlaylist = {
+                    ...requestOptions,
+                    body: JSON.stringify({
+                        name: form.title,
+                        description: form.description,
+                        public: false,
+                        collaborative: false,
+                    }),
+                }
+                
+                const responseCreatePlayList = await fetch(`${config.SPOTIFY_BASE_URL}/users/${userId}/playlists`, optionsCreatePlaylist).then(data=> data.json());
+                
+                const optionsAddTrack = {
+                    ...requestOptions,
+                    body: JSON.stringify({
+                      uriTracks
+                     }),
+                }
+                
+                await fetch(`${config.SPOTIFY_BASE_URL}/playlists/${responseCreatePlayList.id}/tracks`, optionsAddTrack).then(data=> data.json());
+                
+                
+                setForm({ title: '', description: '' });
+                alert('Playlist created successfully');
+                
+            } catch (error) {
+            alert(error);
+            }
+        }else{
+            alert('Title must be large than 10 characters');
+        }
+    }
 
 
   return (
@@ -82,7 +76,6 @@ export default function CreatePlaylistForm({ uriTracks }) {
               id="title-playlist"
               name="title"
               onChange={handleChange}
-              error={errorForm.title}
               required
             />
                     
@@ -96,7 +89,6 @@ export default function CreatePlaylistForm({ uriTracks }) {
               name="description"
               onChange={handleChange}
               required
-              error={errorForm.description}
             />
           
           <div className="form-playlist__action">
@@ -106,4 +98,3 @@ export default function CreatePlaylistForm({ uriTracks }) {
     </div>
   )
 }
-
